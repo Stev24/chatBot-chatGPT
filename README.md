@@ -1,21 +1,20 @@
-# Nuxt 3 Minimal Starter
+# Nuxt 3 Chatbot with Openai
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+<img width="673" alt="Screenshot 2023-11-29 at 15 21 37" src="https://github.com/Stev24/chatBot-chatGPT/assets/8513106/60bc81ca-77a1-4e80-a83d-91a8fb84e5b2">
+
 
 ## Setup
 
 Make sure to install the dependencies:
 
-```bash
-# yarn
-yarn install
-
 # npm
 npm install
 
-# pnpm
-pnpm install
-```
+Also don't forget to set the environnment variables: 
+
+OPENAI_API_KEY=
+OPENAI_ASSISTANT_ID=
+
 
 ## Development Server
 
@@ -25,19 +24,4 @@ Start the development server on http://localhost:3000
 npm run dev
 ```
 
-## Production
 
-Build the application for production:
-
-```bash
-npm run build
-```
-
-Locally preview production build:
-
-```bash
-npm run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
-# reddit-summary
