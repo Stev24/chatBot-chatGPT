@@ -53,7 +53,7 @@
 <template>
 	<div class="max-w-xl mx-auto text-black">
 		<div class="max-w-xl mx-auto">
-			<div class="bg-white rounded-md shadow flex flex-col justify-between">
+			<div class="bg-white rounded-md shadow h-full flex flex-col justify-between">
 				<div class="h-full overflow-auto chat-messages">
 					<div v-for="(message, i) in messages" :key="i" class="flex flex-col p-4">
 						<div v-if="message.role === 'AI'" class="pr-8 mr-auto">
