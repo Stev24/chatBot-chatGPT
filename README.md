@@ -8,7 +8,10 @@
 Make sure to install the dependencies:
 
 # npm
+
+```bash
 npm install
+```
 
 Also don't forget to set the environnment variables: 
 
