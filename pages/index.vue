@@ -1,60 +1,63 @@
 <script setup>
-    const conversationStart = ref(false);
-	const messages = ref([
-		{
-			role: 'AI',
-			message: 'Hello! How can I help you? I\'m Steven\'s assistant and can answer your questions about his services.'
-		}
-	]);
-	const loading = ref(false);
-	const message = ref('');
+let conversationThread = undefined;
+const messages = ref([
+	{
+		role: "AI",
+		message:
+			"Hello! How can I help you? I'm Steven's assistant and can answer your questions about his services.",
+	},
+]);
+const loading = ref(false);
+const message = ref("");
 
-	const scrollToEnd = () => {
-		setTimeout(() => {
-			const chatMessages = document.querySelector('.chat-messages > div:last-child');
-			chatMessages?.scrollIntoView({ behavior: 'smooth', block: 'end' });
-		}, 100);
-	};
+const scrollToEnd = () => {
+	setTimeout(() => {
+		const chatMessages = document.querySelector(
+			".chat-messages > div:last-child"
+		);
+		chatMessages?.scrollIntoView({ behavior: "smooth", block: "end" });
+	}, 100);
+};
 
-	onMounted(()=> {
-		conversationStart.value = true;
-	})
+onMounted(() => {
+	conversationThread = undefined;
+});
 
-	const sendPrompt = async () => {
-		if (message.value === '') return;
-		loading.value = true;
+const sendPrompt = async () => {
+	if (message.value === "") return;
+	loading.value = true;
 
+	messages.value.push({
+		role: "User",
+		message: message.value,
+		conversationThread: conversationThread,
+	});
+
+	scrollToEnd();
+	message.value = "";
+
+	const res = await fetch(`/api/chat`, {
+		body: JSON.stringify(messages.value.slice(1)),
+		method: "post",
+	});
+
+	if (res.status === 200) {
+		const response = await res.json();
 		messages.value.push({
-			role: 'User',
-			message: message.value,
-			conversationStart,
+			role: "AI",
+			message: response?.message.value,
 		});
-
-		scrollToEnd();
-		message.value = '';
-
-		const res = await fetch(`/api/chat`, {
-			body: JSON.stringify(messages.value.slice(1)),
-			method: 'post'
+		conversationThread = response?.message.thread;
+	} else {
+		messages.value.push({
+			role: "AI",
+			message: "Sorry, an error occurred.",
 		});
+	}
 
-		if (res.status === 200) {
-			const response = await res.json();
-			messages.value.push({
-				role: 'AI',
-				message: response?.message
-			});
-		} else {
-			messages.value.push({
-				role: 'AI',
-				message: 'Sorry, an error occurred.'
-			});
-		}
-
-		loading.value = false;
-		conversationStart.value = false;
-		scrollToEnd();
-	};
+	loading.value = false;
+	scrollToEnd();
+};
 </script>
 
 <template>
@@ -80,38 +83,15 @@
 				</div>
 				<form @submit.prevent="sendPrompt">
 					<div class="flex items-center w-full p-4">
-						<input
-							v-model="message"
-							type="text"
-							placeholder="Type here..."
-							class="w-full p-1 text-sm text-black bg-transparent bg-gray-100 border rounded-md shadow border-white/40 grow"
-						/>
-						<button
-							:disabled="loading"
-							type="submit"
-							class="flex items-center justify-center flex-none w-10 h-10 ml-2 bg-green-500 rounded-full"
-						>
-							<svg
-								width="24"
-								height="24"
-								viewBox="0 0 24 24"
-								fill="none"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									d="M22 2L11 13"
-									stroke="white"
-									stroke-width="1.5"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-								/>
-								<path
-									d="M22 2L15 22L11 13L2 9L22 2Z"
-									stroke="white"
-									stroke-width="1.5"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-								/>
+						<input v-model="message" type="text" placeholder="Type here..."
+							class="w-full p-1 text-sm text-black bg-transparent bg-gray-100 border rounded-md shadow border-white/40 grow" />
+						<button :disabled="loading" type="submit"
+							class="flex items-center justify-center flex-none w-10 h-10 ml-2 bg-green-500 rounded-full">
+							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M22 2L11 13" stroke="white" stroke-width="1.5" stroke-linecap="round"
+									stroke-linejoin="round" />
+								<path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="1.5"
+									stroke-linecap="round" stroke-linejoin="round" />
 							</svg>
 						</button>
 					</div>
@@ -122,29 +102,32 @@
 </template>
 
 <style>
-	.loader {
-		width: 12px;
-		height: 12px;
-		border-radius: 50%;
-		display: block;
-		position: relative;
-		color: #d3d3d3;
-		box-sizing: border-box;
-		animation: animloader 2s linear infinite;
+.loader {
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	display: block;
+	position: relative;
+	color: #d3d3d3;
+	box-sizing: border-box;
+	animation: animloader 2s linear infinite;
+}
+
+@keyframes animloader {
+	0% {
+		box-shadow: 14px 0 0 -2px, 38px 0 0 -2px, -14px 0 0 -2px, -38px 0 0 -2px;
 	}
 
-	@keyframes animloader {
-		0% {
-			box-shadow: 14px 0 0 -2px, 38px 0 0 -2px, -14px 0 0 -2px, -38px 0 0 -2px;
-		}
-		25% {
-			box-shadow: 14px 0 0 -2px, 38px 0 0 -2px, -14px 0 0 -2px, -38px 0 0 2px;
-		}
-		50% {
-			box-shadow: 14px 0 0 -2px, 38px 0 0 -2px, -14px 0 0 2px, -38px 0 0 -2px;
-		}
-		75% {
-			box-shadow: 14px 0 0 2px, 38px 0 0 -2px;
-		}
+	25% {
+		box-shadow: 14px 0 0 -2px, 38px 0 0 -2px, -14px 0 0 -2px, -38px 0 0 2px;
 	}
+
+	50% {
+		box-shadow: 14px 0 0 -2px, 38px 0 0 -2px, -14px 0 0 2px, -38px 0 0 -2px;
+	}
+
+	75% {
+		box-shadow: 14px 0 0 2px, 38px 0 0 -2px;
+	}
+}
 </style>

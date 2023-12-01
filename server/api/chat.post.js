@@ -4,20 +4,18 @@ const openai = new OpenAI({
   apiKey: process.env["OPENAI_API_KEY"], // defaults to process.env["OPENAI_API_KEY"]
 });
 
-let thread;
-
 export default defineEventHandler(async (event) => {
   const previosMessages = await readBody(event);
-
   const lastMessageObject = previosMessages.pop();
 
+  let thread = lastMessageObject.conversationThread;
+
   // Create a thread
-  if (lastMessageObject?.conversationStart) {
+  if (!thread) {
     thread = await openai.beta.threads.create();
     console.log("initiate thread", thread);
   }
 
-  
   // Pass in the user question into the existing thread
   await openai.beta.threads.messages.create(thread.id, {
     role: "user",
@@ -51,7 +49,11 @@ export default defineEventHandler(async (event) => {
 
   console.log(lastMessageForRun.content[0].text.value);
 
+  const returnMessage = {};
+  returnMessage.value = lastMessageForRun.content[0].text.value;
+  returnMessage.thread = thread;
+
   return {
-    message: lastMessageForRun.content[0].text.value,
+    message: returnMessage,
   };
 });
