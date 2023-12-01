@@ -1,4 +1,5 @@
 <script setup>
+    const conversationStart = ref(false);
 	const messages = ref([
 		{
 			role: 'AI',
@@ -15,13 +16,18 @@
 		}, 100);
 	};
 
+	onMounted(()=> {
+		conversationStart.value = true;
+	})
+
 	const sendPrompt = async () => {
 		if (message.value === '') return;
 		loading.value = true;
 
 		messages.value.push({
 			role: 'User',
-			message: message.value
+			message: message.value,
+			conversationStart,
 		});
 
 		scrollToEnd();
@@ -46,6 +52,7 @@
 		}
 
 		loading.value = false;
+		conversationStart.value = false;
 		scrollToEnd();
 	};
 </script>
